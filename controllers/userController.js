@@ -556,10 +556,16 @@ const userController = {
                 response:{id:req.user.id,
                     fullName:req.fullName,
                     email:req.user.email,
+                    from:rea.user.from
                     }
             })
+        }else{
+            res.json({
+                success:false,
+                message:"please sign again"
+            })
         }
-        
+                
     }
 
 }
