@@ -1,8 +1,10 @@
 const express = require('express');
 const cors = require("cors");
+const passport = require("passport");
 require("dotenv").config();
-require("./config/database.js")
-const userRouter = require('./routers/userRouter.js')
+require("./config/database.js");
+const userRouter = require('./routers/userRouter.js');
+
 
 const app = express();
 
@@ -12,7 +14,9 @@ app.set("port", PORT);
 
 app.use(cors())
 app.use(express.json())
+app.use(passport.initialize())
 app.use('/api', userRouter)
+
 
 // app.get("/", (req, res) => {
 //     res.send("servidor creado")

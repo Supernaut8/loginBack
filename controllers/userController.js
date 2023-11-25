@@ -68,7 +68,7 @@ const sendEmail = async (mailUser, uniqueString) => {
         "https://developers.google.com/oauthplayground"
     )
     //config el token de actualizacion en el oauth2
-       oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_TOKEN_REFRESH })
+    oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_TOKEN_REFRESH })
 
     const accessToken = oauth2Client.getAccessToken()//await agregado por chatgpt
     const transporter = nodemailer.createTransport({
@@ -387,9 +387,9 @@ const userController = {
     SignUp: async (req, res) => {
         const { fullName, email, password, from, aplication } = req.body.userData
         const contraseñaHash = bcryptjs.hashSync(password, 10)
-        
-        const emailVerify=false
-        const uniqueString=crypto.randomBytes(15).toString("hex")
+
+        const emailVerify = false
+        const uniqueString = crypto.randomBytes(15).toString("hex")
         try {
             const userExist = await Users.findOne({ email })
 
@@ -398,7 +398,7 @@ const userController = {
                     res.json({
                         success: false,
                         from: from,
-                        message: "Ya realizaste sign up mediante " + from + " por favor realiza sign in"
+                        message: "You have already signed up through " + from + " please do sign in"
                     })
                 }
                 else {
@@ -410,7 +410,7 @@ const userController = {
                     res.json({
                         success: true,
                         from: from,
-                        message: "Se agrego " + from + " a tus metodos para realizar sign in"
+                        message: "Added " + from + " to your methods to sign in"
                     })
                 }
             }
@@ -424,35 +424,35 @@ const userController = {
                     emailVerify,
                     uniqueString
                 })
-                
-                if(from==="signUp-form"){
+
+                if (from === "signUp-form") {
                     sendEmail(email, uniqueString)
-                   await newUser.save()
+                    await newUser.save()
                     res.json({
                         success: true,
-                        from:from,
-                        message: "review your email to validate sing up"
+                        from: from,
+                        message: "Review your email to validate sing up"
                     })
-                }else{
+                } else {
 
-                    newUser.emailVerify=true
+                    newUser.emailVerify = true
                     await newUser.save()
 
                     res.json({
                         success: true,
                         from: from,
-                        message: "Felicitaciones creamos tu usuario y agregamos " + from + " a tus metodos para sign in",
+                        message: "Congratulations, we created your username and added " + from + " to your methods to sign in",
                     })
                 }
 
             }
         } catch (error) {
-            console.log(error,"error en controlador signup")
+            console.log(error, "error en controlador signup")
             res.json({ sucess: false, message: "Something has gone wrong, try it in a few minutes." })
         }
     },
     SignIn: async (req, res) => {
-        const { email, password, from } = req.body.userData
+        const { email, password, from, aplication } = req.body.userData
         try {
             const usuario = await Users.findOne({ email })
 
@@ -460,7 +460,7 @@ const userController = {
                 res.json({
                     success: false,
                     from: from,
-                    message: "No has realizado sign up con este email, realizalo antes de hacer sign in"
+                    message: "You have not signed up with this email, do so before signing in"
                 })
             } else {
                 const contraseñaCoincide = usuario.password.filter(pass => bcryptjs.compareSync(password, pass))
@@ -468,17 +468,18 @@ const userController = {
                     id: usuario._id,
                     fullName: usuario.fullName,
                     email: usuario.email,
-                    from: from
+                    from: from,
+                    aplication
                 }
 
                 if (from !== 'signUp-form') {
                     if (contraseñaCoincide.length > 0) {
-                        const tokenUser= jwt.sign({...dataUser},process.env. SECRET_TOKEN,{expiresIn:"1h"})
+                        const tokenUser = jwt.sign({ ...dataUser }, process.env.SECRET_TOKEN, { expiresIn: "1h" })
                         res.json({
                             success: true,
                             from,
-                            response: {dataUser,tokenUser},
-                            message: "Bienvenido nuevamente " + dataUser.fullName
+                            response: { dataUser, tokenUser },
+                            message: "Welcome again " + dataUser.fullName
                         })
                     } else {
                         const contraseñaHash = bcryptjs.hashSync(password, 10)
@@ -486,29 +487,29 @@ const userController = {
                         usuario.password.push(contraseñaHash)
 
                         await usuario.save()
-                        const tokenUser= jwt.sign({...dataUser},process.env. SECRET_TOKEN,{expiresIn:"1h"})
+                        const tokenUser = jwt.sign({ ...dataUser }, process.env.SECRET_TOKEN, { expiresIn: "1h" })
                         res.json({
                             success: true,
                             from,
-                            response: {dataUser,tokenUser},
-                            message: "No contabas con " + from + " dentro de tus métodos para realizar sign in, pero tranquilo ya lo agregamos"
+                            response: { dataUser, tokenUser },
+                            message: "You didn't count on " + from + " within your methods to sign in, but don't worry, we'll add it"
                         })
                     }
                 } else {
                     if (contraseñaCoincide.length > 0) {
-                        const tokenUser= jwt.sign({...dataUser},process.env. SECRET_TOKEN,{expiresIn:"1h"})
+                        const tokenUser = jwt.sign({ ...dataUser }, process.env.SECRET_TOKEN, { expiresIn: "1h" })
                         res.json({
                             success: true,
                             from,
-                            response: {dataUser,tokenUser},
-                            message: "Bienvenido nuevamente " + dataUser.fullName
+                            response: { dataUser, tokenUser },
+                            message: "Welcome again " + dataUser.fullName
                         })
                     } else {
                         res.json({
                             success: false,
                             from,
-                            
-                            message: "El usuario o password no coinciden"
+
+                            message: "The username or password do not match"
                         })
                     }
                 }
@@ -516,7 +517,7 @@ const userController = {
         } catch (error) {
             res.json({
                 sucess: false,
-                message: "Ups algo salio mal, reintentalo en unos minutos",
+                message: "Ups something went wrong, try again in a few minutes",
                 response: err
             })
         }
@@ -542,30 +543,32 @@ const userController = {
                 res.json({
                     success: false,
                     from: "verify",
-                    message: "Email del usuario no pudo ser verificado"
+                    message: "User email could not be verified"
                 })
             }
         } catch (err) {
             console.log(err)
         }
     },
-    verifyTokenSession:(req,res)=>{
-        if(req.use){
+    verifyTokenSession: (req, res) => {
+        if (req.user) {
             res.json({
-                success:true,
-                response:{id:req.user.id,
-                    fullName:req.fullName,
-                    email:req.user.email,
-                    from:rea.user.from
-                    }
+                success: true,
+                response: {
+                    id: req.user.id,
+                    fullName: req.user.fullName,
+                    email: req.user.email,
+                    from: req.user.from
+                    // from: "token"
+                },
+                message: "Welcome again " + req.user.fullName
             })
-        }else{
+        } else {
             res.json({
-                success:false,
-                message:"please sign again"
+                success: false,
+                message: "Please sign in again"
             })
         }
-                
     }
 
 }
@@ -573,9 +576,3 @@ const userController = {
 module.exports = userController
 
 
-//ultima clase
-
-// const token = jwt.sign({...dataUser}, process.env.SECRET_TOKEN, {expiresIn: '1h'})
-
-
-//ultima clase
