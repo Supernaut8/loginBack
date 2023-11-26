@@ -15,7 +15,7 @@ userRouter.route('/users/auth/signIn')
 userRouter.route('/users/auth/verifyEmail/:string')
 .get(verifyMail)
 
-Router.route("/users/auth/verifyToken").get(passport.authenticate("jwt",{session:false}),verifyTokenSession)
+userRouter.route("/users/auth/verifyToken").get(passport.authenticate("jwt",{session:false}),verifyTokenSession)
 
 module.exports = userRouter
   

@@ -1,7 +1,7 @@
 const passport=require("passport")
 const jwtStrategy=require("passport-jwt").Strategy
 const exttractJWT=require("passport-jwt").ExtractJwt
-const UserModel=require("../models/usuariosModelo")
+const UserModel=require("../models/userModel")
 module.exports =passport.use(new jwtStrategy({
     //param 1 de strategy
     jwtFromRequest:exttractJWT.fromAuthHeaderAsBearerToken(),
