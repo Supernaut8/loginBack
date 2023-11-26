@@ -547,17 +547,24 @@ const userController = {
                 })
             }
         } catch (err) {
-            console.log(err)
+            console.log(err," error catcheado en signIn")
         }
     },
     verifyTokenSession:(req,res)=>{
         if(req.use){
             res.json({
                 success:true,
-                response:{id:req.user.id,
+                response:{
+                    id:req.user.id,
                     fullName:req.fullName,
                     email:req.user.email,
-                    }
+                    },
+                message:"welcom "+req.user.fullName
+            })
+        }else{
+            res.json({
+                success:false,
+                message:"Session expired. Please again signIn"
             })
         }
         
