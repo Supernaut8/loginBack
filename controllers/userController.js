@@ -452,7 +452,8 @@ const userController = {
         }
     },
     SignIn: async (req, res) => {
-        const { email, password, from } = req.body.userData
+        console.log("data user: ",req.body)
+        const { email, password, from } = req.body.logedUser
         try {
             const usuario = await Users.findOne({ email })
 
