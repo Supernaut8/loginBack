@@ -551,7 +551,7 @@ const userController = {
         }
     },
     verifyTokenSession:(req,res)=>{
-        if(req.use){
+        if(req.user){
             res.json({
                 success:true,
                 response:{
@@ -568,7 +568,8 @@ const userController = {
             })
         }
         
-    }
+    },
+
 
 }
 
