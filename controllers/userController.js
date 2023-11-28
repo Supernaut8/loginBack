@@ -398,7 +398,7 @@ const userController = {
                     res.json({
                         success: false,
                         from: from,
-                        message: "Ya realizaste sign up mediante " + from + " por favor realiza sign in"
+                        message: "You have already signed up with " + from + " please sign in"
                     })
                 }
                 else {
@@ -410,7 +410,7 @@ const userController = {
                     res.json({
                         success: true,
                         from: from,
-                        message: "Se agrego " + from + " a tus metodos para realizar sign in"
+                        message: "the new method was added: "+from
                     })
                 }
             }
@@ -441,7 +441,7 @@ const userController = {
                     res.json({
                         success: true,
                         from: from,
-                        message: "Felicitaciones creamos tu usuario y agregamos " + from + " a tus metodos para sign in",
+                        message: "Congratulations, we created your user with" + from ,
                     })
                 }
 
@@ -461,7 +461,7 @@ const userController = {
                 res.json({
                     success: false,
                     from: from,
-                    message: "No has realizado sign up con este email, realizalo antes de hacer sign in"
+                    message: "You have not signed up with this email, do so before signing in"
                 })
             } else {
                 const contraseñaCoincide = usuario.password.filter(pass => bcryptjs.compareSync(password, pass))
@@ -479,7 +479,7 @@ const userController = {
                             success: true,
                             from,
                             response: {dataUser,tokenUser},
-                            message: "Bienvenido nuevamente " + dataUser.fullName
+                            message: "welcome again " + dataUser.fullName
                         })
                     } else {
                         const contraseñaHash = bcryptjs.hashSync(password, 10)
@@ -492,7 +492,7 @@ const userController = {
                             success: true,
                             from,
                             response: {dataUser,tokenUser},
-                            message: "No contabas con " + from + " dentro de tus métodos para realizar sign in, pero tranquilo ya lo agregamos"
+                            message: "we add the method" + from 
                         })
                     }
                 } else {
@@ -502,14 +502,14 @@ const userController = {
                             success: true,
                             from,
                             response: {dataUser,tokenUser},
-                            message: "Bienvenido nuevamente " + dataUser.fullName
+                            message: "welcome again" + dataUser.fullName
                         })
                     } else {
                         res.json({
                             success: false,
                             from,
                             
-                            message: "El usuario o password no coinciden"
+                            message: "Username or password do not match"
                         })
                     }
                 }
@@ -517,7 +517,7 @@ const userController = {
         } catch (error) {
             res.json({
                 sucess: false,
-                message: "Ups algo salio mal, reintentalo en unos minutos",
+                message: "Oops something went wrong, try again in a few minutes",
                 response: error
             })
         }
@@ -543,7 +543,7 @@ const userController = {
                 res.json({
                     success: false,
                     from: "verify",
-                    message: "Email del usuario no pudo ser verificado"
+                    message: "User email could not be verified"
                 })
             }
         } catch (err) {
