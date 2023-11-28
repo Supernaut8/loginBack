@@ -452,11 +452,11 @@ const userController = {
         }
     },
     SignIn: async (req, res) => {
-        console.log("data user: ",req.body)
+        
         const { email, password, from } = req.body.logedUser
         try {
             const usuario = await Users.findOne({ email })
-
+            console.log(usuario)
             if (!usuario) {
                 res.json({
                     success: false,
@@ -518,7 +518,7 @@ const userController = {
             res.json({
                 sucess: false,
                 message: "Ups algo salio mal, reintentalo en unos minutos",
-                response: err
+                response: error
             })
         }
     },
@@ -551,12 +551,14 @@ const userController = {
         }
     },
     verifyTokenSession:(req,res)=>{
+        
         if(req.user){
+            console.log(req.user.fullName)
             res.json({
                 success:true,
                 response:{
                     id:req.user.id,
-                    fullName:req.fullName,
+                    fullName:req.user.fullName,
                     email:req.user.email,
                     },
                 message:"welcom "+req.user.fullName
