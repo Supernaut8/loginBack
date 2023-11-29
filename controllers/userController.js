@@ -455,8 +455,8 @@ const userController = {
         
         const { email, password, from } = req.body.logedUser
         try {
-            const usuario = await Users.findOne({ email })
-            console.log(usuario)
+            const usuario = await Users.findOne({ email }).populate("planesSuscrip")
+           
             if (!usuario) {
                 res.json({
                     success: false,
@@ -469,7 +469,8 @@ const userController = {
                     id: usuario._id,
                     fullName: usuario.fullName,
                     email: usuario.email,
-                    from: from
+                    from: from,
+                    planesSuscrip:usuario.planesSuscrip
                 }
 
                 if (from !== 'signUp-form') {
@@ -550,16 +551,17 @@ const userController = {
             console.log(err," error catcheado en signIn")
         }
     },
-    verifyTokenSession:(req,res)=>{
-        
-        if(req.user){
-            console.log(req.user.fullName)
+    verifyTokenSession:async(req,res)=>{
+            const user=await User.findOne({_id:req.user.id}).populate("planesSuscrip")
+        if(req.user && user!==null){
+            console.log("renovar token con planes:",user)
             res.json({
                 success:true,
                 response:{
                     id:req.user.id,
                     fullName:req.user.fullName,
                     email:req.user.email,
+                    planesSuscrip:user.planesSuscrip
                     },
                 message:"welcom "+req.user.fullName
             })
@@ -571,7 +573,38 @@ const userController = {
         }
         
     },
+    suscripcionPlan:async(req,res)=>{
+       
+       const  {idPlan,idUser}=req.body
+       console.log("se respondio",idUser)
+       const userToUpDate=await User.findOne({_id:idUser})
+       
+        if(userToUpDate!==null){
+            userToUpDate.planesSuscrip.push(idPlan)
+            await userToUpDate.save()
+            const userWithPlanes=await User.findOne({_id:idUser}).populate("planesSuscrip")
 
+            res.json({
+                success: true,
+                from:"suscription",
+                response: {dataUser:{
+                    fullName:userWithPlanes.fullName,
+                    email:userWithPlanes.email,
+                    id:userWithPlanes._id,
+                    planesSuscrip:userWithPlanes.planesSuscrip
+                    
+                }},
+                message: "Congrats "
+            })
+        }else{
+            res.json({
+                success:false,
+                from:"suscription",
+                response: {dataUser:userToUpDate},
+                message: "Fail whith suscription"
+            })
+        }
+    }
 
 }
 
