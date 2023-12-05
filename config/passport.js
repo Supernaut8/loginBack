@@ -23,7 +23,7 @@ module.exports =passport.use(new jwtStrategy({
                             return done(null,false)
                         }
                 }).catch(err=>{
-                    console.log("catcheo de error en passoport.js: ",err)
+                    console.log("catcheo de error en passport.js: ",err)
                     return done(err,false)
                 })
         }

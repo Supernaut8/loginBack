@@ -68,7 +68,7 @@ const sendEmail = async (mailUser, uniqueString) => {
         "https://developers.google.com/oauthplayground"
     )
     //config el token de actualizacion en el oauth2
-       oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_TOKEN_REFRESH })
+    oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_TOKEN_REFRESH })
 
     const accessToken = oauth2Client.getAccessToken()//await agregado por chatgpt
     const transporter = nodemailer.createTransport({
@@ -387,9 +387,9 @@ const userController = {
     SignUp: async (req, res) => {
         const { fullName, email, password, from, aplication } = req.body.userData
         const contraseñaHash = bcryptjs.hashSync(password, 10)
-        
-        const emailVerify=false
-        const uniqueString=crypto.randomBytes(15).toString("hex")
+
+        const emailVerify = false
+        const uniqueString = crypto.randomBytes(15).toString("hex")
         try {
             const userExist = await Users.findOne({ email })
 
@@ -410,7 +410,7 @@ const userController = {
                     res.json({
                         success: true,
                         from: from,
-                        message: "the new method was added: "+from
+                        message: "the new method was added: " + from
                     })
                 }
             }
@@ -424,39 +424,39 @@ const userController = {
                     emailVerify,
                     uniqueString
                 })
-                
-                if(from==="signUp-form"){
+
+                if (from === "signUp-form") {
                     sendEmail(email, uniqueString)
-                   await newUser.save()
+                    await newUser.save()
                     res.json({
                         success: true,
-                        from:from,
+                        from: from,
                         message: "review your email to validate sing up"
                     })
-                }else{
+                } else {
 
-                    newUser.emailVerify=true
+                    newUser.emailVerify = true
                     await newUser.save()
 
                     res.json({
                         success: true,
                         from: from,
-                        message: "Congratulations, we created your user with" + from ,
+                        message: "Congratulations, we created your user with" + from,
                     })
                 }
 
             }
         } catch (error) {
-            console.log(error,"error en controlador signup")
+            console.log(error, "error en controlador signup")
             res.json({ sucess: false, message: "Something has gone wrong, try it in a few minutes." })
         }
     },
     SignIn: async (req, res) => {
-        
+
         const { email, password, from } = req.body.logedUser
         try {
             const usuario = await Users.findOne({ email }).populate("planesSuscrip")
-           
+
             if (!usuario) {
                 res.json({
                     success: false,
@@ -470,17 +470,17 @@ const userController = {
                     fullName: usuario.fullName,
                     email: usuario.email,
                     from: from,
-                    planesSuscrip:usuario.planesSuscrip
+                    planesSuscrip: usuario.planesSuscrip
                 }
 
                 if (from !== 'signUp-form') {
                     if (contraseñaCoincide.length > 0) {
-                        const tokenUser= jwt.sign({...dataUser},process.env. SECRET_TOKEN,{expiresIn:"1h"})
+                        const tokenUser = jwt.sign({ ...dataUser }, process.env.SECRET_TOKEN, { expiresIn: "1h" })
                         res.json({
                             success: true,
                             from,
-                            response: {dataUser,tokenUser},
-                            message: "welcome again " + dataUser.fullName
+                            response: { dataUser, tokenUser },
+                            message: "Welcome again " + dataUser.fullName
                         })
                     } else {
                         const contraseñaHash = bcryptjs.hashSync(password, 10)
@@ -488,28 +488,28 @@ const userController = {
                         usuario.password.push(contraseñaHash)
 
                         await usuario.save()
-                        const tokenUser= jwt.sign({...dataUser},process.env. SECRET_TOKEN,{expiresIn:"1h"})
+                        const tokenUser = jwt.sign({ ...dataUser }, process.env.SECRET_TOKEN, { expiresIn: "1h" })
                         res.json({
                             success: true,
                             from,
-                            response: {dataUser,tokenUser},
-                            message: "we add the method" + from 
+                            response: { dataUser, tokenUser },
+                            message: "We add the method " + from
                         })
                     }
                 } else {
                     if (contraseñaCoincide.length > 0) {
-                        const tokenUser= jwt.sign({...dataUser},process.env. SECRET_TOKEN,{expiresIn:"1h"})
+                        const tokenUser = jwt.sign({ ...dataUser }, process.env.SECRET_TOKEN, { expiresIn: "1h" })
                         res.json({
                             success: true,
                             from,
-                            response: {dataUser,tokenUser},
-                            message: "welcome again" + dataUser.fullName
+                            response: { dataUser, tokenUser },
+                            message: "Welcome again " + dataUser.fullName
                         })
                     } else {
                         res.json({
                             success: false,
                             from,
-                            
+
                             message: "Username or password do not match"
                         })
                     }
@@ -548,72 +548,80 @@ const userController = {
                 })
             }
         } catch (err) {
-            console.log(err," error catcheado en signIn")
+            console.log(err, " error catcheado en signIn")
         }
     },
-    verifyTokenSession:async(req,res)=>{
-            const user=await User.findOne({_id:req.user.id}).populate("planesSuscrip")
-        if(req.user && user!==null){
-            console.log("renovar token con planes:",user)
-            res.json({
-                success:true,
-                response:{
-                    id:req.user.id,
-                    fullName:req.user.fullName,
-                    email:req.user.email,
-                    planesSuscrip:user.planesSuscrip
-                    },
-                message:"welcom "+req.user.fullName
-            })
-        }else{
-            res.json({
-                success:false,
-                message:"Session expired. Please again signIn"
-            })
-        }
-        
-    },
-    suscripcionPlan:async(req,res)=>{
-       
-       const  {idPlan,idUser}=req.body
-       console.log("se respondio",idUser)
-       const userToUpDate=await User.findOne({_id:idUser})
-       
-        if(userToUpDate!==null){
-            userToUpDate.planesSuscrip.push(idPlan)
-            await userToUpDate.save()
-            const userWithPlanes=await User.findOne({_id:idUser}).populate("planesSuscrip")
-
+    verifyTokenSession: async (req, res) => {
+        const user = await User.findOne({ _id: req.user.id }).populate("planesSuscrip")
+        if (req.user && user !== null) {
+            console.log("renovar token con planes:", user)
             res.json({
                 success: true,
-                from:"suscription",
-                response: {dataUser:{
-                    fullName:userWithPlanes.fullName,
-                    email:userWithPlanes.email,
-                    id:userWithPlanes._id,
-                    planesSuscrip:userWithPlanes.planesSuscrip
-                    
-                }},
-                message: "Congrats "
+                response: {
+                    id: req.user.id,
+                    fullName: req.user.fullName,
+                    email: req.user.email,
+                    planesSuscrip: user.planesSuscrip,
+                    // from: "token",
+                    aplication: req.user.aplication
+                },
+                message: "Welcome " + req.user.fullName
             })
-        }else{
+        } else {
             res.json({
-                success:false,
-                from:"suscription",
-                response: {dataUser:userToUpDate},
-                message: "Fail whith suscription"
+                success: false,
+                message: "Session expired. Please sign in again"
             })
         }
-    }
+
+    },
+    suscripcionPlan: async (req, res) => {
+
+        const { idPlan, idUser } = req.body.dataSuscripcion
+        console.log("se respondio", idUser, idPlan)
+        const userToUpDate = await User.findOne({ _id: idUser }).populate("planesSuscrip")
+        
+        if (userToUpDate !== null) {
+            const planExist = userToUpDate.planesSuscrip.find((plan => plan.equals(idPlan)))
+
+            if (!planExist) {
+                userToUpDate.planesSuscrip.push(idPlan);
+                await userToUpDate.save();
+                const userWithPlanes = await User.findOne({ _id: idUser }).populate("planesSuscrip");
+
+                res.json({
+                    success: true,
+                    from: "suscription",
+                    response: {
+                        dataUser: {
+                            fullName: userWithPlanes.fullName,
+                            email: userWithPlanes.email,
+                            id: userWithPlanes._id,
+                            planesSuscrip: userWithPlanes.planesSuscrip,
+                        },
+                    },
+                    message: "Congratulations, successful subscription",
+                });
+            } else {
+                res.json({
+                    success: false,
+                    from: "suscription",
+                    response: { dataUser: userToUpDate },
+                    message: "You already have this subscription"
+                });
+            }
+        } else {
+            res.json({
+                success: false,
+                from: "suscription",
+                response: { dataUser: userToUpDate },
+                message: "Fail with subscription",
+            });
+        }
+    },
 
 }
 
-module.exports = userController
+module.exports = userController;
 
 
-//ultima clase
-
-// const token = jwt.sign({...dataUser}, process.env.SECRET_TOKEN, {expiresIn: '1h'})
-
-
-//ultima clase
